@@ -7,7 +7,7 @@ import { bimap, fold, Either, left, right } from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as _ from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
-import { GridList, GridListTile, GridListTileBar, IconButton, Typography, Divider } from '@material-ui/core';
+import { GridList, GridListTile, GridListTileBar, IconButton, Typography, Divider, createMuiTheme, ThemeProvider, useMediaQuery } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { from } from 'rxjs';
 
@@ -45,7 +45,10 @@ const useStyles = makeStyles((theme) => ({
     height: '100%'
   },
   section: {
-    marginBottom: '2em'
+    marginBottom: '3em'
+  },
+  divider: {
+    marginBottom: '1em'
   }
 }));
 
@@ -61,6 +64,24 @@ type IIcecreamArray = io.TypeOf<typeof IceCreamArrayValidator>;
 
 const icecreamDatas = IceCreamArrayValidator.decode(icecreamJson)
 
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: [
+      'Gugi',
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+  },
+});
+
 if (icecreamDatas._tag == "Right") {
   console.log(icecreamDatas.right)
 }
@@ -73,16 +94,18 @@ function App() {
     r => {
       const sortedPrices = _.uniq(r.map(x => x.price)).sort((a, b) => a - b)
       return (
+        <ThemeProvider theme={theme}>
         <div className={classes.body}>
           {
             sortedPrices.map(price => {
               const icecreams = r.filter(x => x.price == price).map(x => x.name);
               return (
                 <div className={classes.section}>
-                  <Divider />
                   <Typography variant="h3" component="h3">
                     {price}원
                     </Typography>
+                    <Divider className={classes.divider}/>
+
                   {SingleLineGridList(icecreams)}
 
                 </div>
@@ -90,6 +113,7 @@ function App() {
             })
           }
         </div>
+        </ThemeProvider>
       )
     })
 
@@ -99,9 +123,11 @@ function App() {
 function SingleLineGridList(icecreams: string[]) {
   const classes = useStyles();
 
+  const matches = useMediaQuery(theme.breakpoints.down('md'));
+
   return (
     <div className={classes.root}>
-      <GridList className={classes.gridList} cols={4}>
+      <GridList className={classes.gridList} cols={matches ? 3 : 4}>
         {icecreams.map((icecream) => (
           <GridListTile key={icecream} cols={1}>
             <IcecreamImage name={icecream}></IcecreamImage>
