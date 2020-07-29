@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import PlaceHolder from './images/ice-cream.svg';
 import './App.css';
 import * as io from "io-ts";
 import icecreamJson from "./icecreams.json";
@@ -7,11 +7,14 @@ import { bimap, fold, Either, left, right } from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/lib/function';
 import * as _ from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
-import { GridList, GridListTile, GridListTileBar, IconButton } from '@material-ui/core';
+import { GridList, GridListTile, GridListTileBar, IconButton, Typography, Divider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { from } from 'rxjs';
 
 const useStyles = makeStyles((theme) => ({
+  body: {
+    padding: '1em'
+  },
   root: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -26,17 +29,23 @@ const useStyles = makeStyles((theme) => ({
     width: '100%'
   },
   title: {
-    color: theme.palette.primary.light,
+    color: 'white'
   },
   titleBar: {
     background:
       'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
   },
   image: {
-    height: '100%'
+    height: '100%',
+    width: '100%',
+    objectFit: 'contain'
+
   },
   skeleton: {
     height: '100%'
+  },
+  section: {
+    marginBottom: '2em'
   }
 }));
 
@@ -57,19 +66,25 @@ if (icecreamDatas._tag == "Right") {
 }
 
 function App() {
+  const classes = useStyles();
+
   return pipe(icecreamDatas, fold(
     l => (<div>error</div>),
     r => {
       const sortedPrices = _.uniq(r.map(x => x.price)).sort((a, b) => a - b)
       return (
-        <div>
+        <div className={classes.body}>
           {
             sortedPrices.map(price => {
               const icecreams = r.filter(x => x.price == price).map(x => x.name);
               return (
-                <div>
-                  {price}
+                <div className={classes.section}>
+                  <Divider />
+                  <Typography variant="h3" component="h3">
+                    {price}원
+                    </Typography>
                   {SingleLineGridList(icecreams)}
+
                 </div>
               )
             })
@@ -113,23 +128,23 @@ interface IcecreamImageProps {
 function IcecreamImage({ name }: IcecreamImageProps) {
   const classes = useStyles();
 
-  const [src, setSrc] = useState<Either<null, string | null>>(left(null))//((<Skeleton variant="rect" className={classes.skeleton}></Skeleton>))
+  const [src, setSrc] = useState<Either<null, string>>(left(null))//((<Skeleton variant="rect" className={classes.skeleton}></Skeleton>))
   useEffect(() => {
     const subscription = from(import('./images/' + name + '.jpg')).subscribe({
       next(x) {
         setSrc(right(x.default))
       },
       error(e) {
-        setSrc(right(null))
+        setSrc(right(PlaceHolder))
       }
     });
-    return ()=>{
+    return () => {
       subscription.unsubscribe();
     }
   }, [])
   return pipe(src, fold(
     l => ((<Skeleton variant="rect" className={classes.skeleton}></Skeleton>)),
-    r => r ? (<img src={r} alt={name} className={classes.image}/>) : (<div>No Image</div>)
+    r => (<img src={r} alt={name} className={classes.image} />)
   ))
 }
 export default App;
