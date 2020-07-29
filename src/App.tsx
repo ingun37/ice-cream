@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   image: {
     height: '100%',
     width: '100%',
-    objectFit: 'contain'
+    objectFit: 'cover'
 
   },
   skeleton: {
