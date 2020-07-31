@@ -10,6 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { GridList, GridListTile, GridListTileBar, IconButton, Typography, Divider, createMuiTheme, ThemeProvider, useMediaQuery } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { from } from 'rxjs';
+import SingleLineGridList from './GridList';
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -86,7 +87,7 @@ if (icecreamDatas._tag == "Right") {
   console.log(icecreamDatas.right)
 }
 
-function App() {
+export default function App() {
   const classes = useStyles();
 
   return pipe(icecreamDatas, fold(
@@ -120,57 +121,3 @@ function App() {
   );
 }
 
-function SingleLineGridList(icecreams: string[]) {
-  const classes = useStyles();
-
-  const matches = useMediaQuery(theme.breakpoints.down('md'));
-
-  return (
-    <div className={classes.root}>
-      <GridList className={classes.gridList} cols={matches ? 3 : 4}>
-        {icecreams.map((icecream) => (
-          <GridListTile key={icecream} cols={1}>
-            <IcecreamImage name={icecream}></IcecreamImage>
-            {/* <Skeleton variant="rect" className={classes.image}></Skeleton> */}
-            {/* <img src={Merona} alt={icecream} className={classes.image} /> */}
-            <GridListTileBar
-              title={icecream}
-              classes={{
-                root: classes.titleBar,
-                title: classes.title,
-              }}
-              actionIcon={null}
-            />
-          </GridListTile>
-        ))}
-      </GridList>
-    </div>
-  );
-}
-
-interface IcecreamImageProps {
-  name: string
-}
-function IcecreamImage({ name }: IcecreamImageProps) {
-  const classes = useStyles();
-
-  const [src, setSrc] = useState<Either<null, string>>(left(null))//((<Skeleton variant="rect" className={classes.skeleton}></Skeleton>))
-  useEffect(() => {
-    const subscription = from(import('./images/' + name + '.jpg')).subscribe({
-      next(x) {
-        setSrc(right(x.default))
-      },
-      error(e) {
-        setSrc(right(PlaceHolder))
-      }
-    });
-    return () => {
-      subscription.unsubscribe();
-    }
-  }, [])
-  return pipe(src, fold(
-    l => ((<Skeleton variant="rect" className={classes.skeleton}></Skeleton>)),
-    r => (<img src={r} alt={name} className={classes.image} />)
-  ))
-}
-export default App;
