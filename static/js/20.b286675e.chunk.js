@@ -1,0 +1,2 @@
+(this["webpackJsonpice-cream"]=this["webpackJsonpice-cream"]||[]).push([[20],{124:function(e,c,p){e.exports=p.p+"static/media/\uba54\ub85c\ub098 \uba54\ub860.1ee3d170.jpg"}}]);
+//# sourceMappingURL=20.b286675e.chunk.js.map
