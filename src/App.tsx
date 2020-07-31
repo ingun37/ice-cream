@@ -101,7 +101,7 @@ export default function App() {
             sortedPrices.map(price => {
               const icecreams = r.filter(x => x.price == price).map(x => x.name);
               return (
-                <div className={classes.section}>
+                <div key={price} className={classes.section}>
                   <Typography variant="h3" component="h3">
                     {price}원
                     </Typography>

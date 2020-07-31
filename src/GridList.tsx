@@ -59,13 +59,15 @@ export default function SingleLineGridList(icecreams: string[]) {
     return (
         <div className={classes.root}>
             {
-                _.chunk(icecreams, 10).map(chunk=> Chunk(chunk)   )
+                _.chunk(icecreams, 10).map((chunk, idx)=> (<Chunk key={idx} icecreams={chunk} />)  )
             }
         </div>
     );
 }
-
-function Chunk(icecreams: string[]) {
+interface ChunkProps {
+    icecreams: string[];
+}
+function Chunk({icecreams}: ChunkProps) {
     const classes = useStyles();
 
     return (
